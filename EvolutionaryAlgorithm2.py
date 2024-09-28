@@ -18,7 +18,7 @@ import sys, os
 
 run_mode = 'train' # train or test
 start_new_generation = False # Delete the current directory of saves, to start training from the beginning
-experiment_name = 'EvolutionaryAlgorithm1'
+experiment_name = 'EvolutionaryAlgorithm2'
 
 # Enemy and fitness function
 enemy = 8
@@ -37,7 +37,7 @@ elite_fraction = 0.05
 
 tournament_k = 3
 crossover_k = 20 # k-point crossover
-parentsn = 2
+# parentsn = 2
 
 class environm(Environment):
     # implements fitness function
@@ -254,11 +254,13 @@ file_aux.close()
 
 
 
-for gen in range(starting_generation + 1, generations):
+for gen in range(starting_generation + 1, generations+1):
     new_generation = np.zeros((population_size, number_of_weights))
     new_fitness = np.zeros(population_size)
 
     elitest, elitest_fitness = elitism(population, population_fitness, elite_fraction)
+
+    parentsn = 32 - gen
 
     for i in range(ceil(len(population) / parentsn)):
         parents = []
