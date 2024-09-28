@@ -32,7 +32,7 @@ population_size = 100
 generations = 30
 mutation_strength = 1 # Gaussian sigma
 p_mutation = 0.02
-p_cross = 0
+p_cross = 0.0
 elite_fraction = 0.05
 
 tournament_k = 3
