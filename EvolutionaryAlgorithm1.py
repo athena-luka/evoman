@@ -11,7 +11,7 @@ from demo_controller import player_controller
 # imports other libs
 import time
 import numpy as np
-from math import fabs,sqrt
+from math import fabs,sqrt,ceil
 import shutil
 import glob, os
 import sys, os
@@ -37,6 +37,7 @@ elite_fraction = 0.05
 
 tournament_k = 3
 crossover_k = 20 # k-point crossover
+parentsn = 2
 
 class environm(Environment):
     # implements fitness function
@@ -259,26 +260,31 @@ for gen in range(starting_generation + 1, generations):
 
     elitest, elitest_fitness = elitism(population, population_fitness, elite_fraction)
 
-    for i in range(len(population) // 2): # 2 children
-        parent1, fitness1 = tournament(tournament_k, population, population_fitness)
-        parent2, fitness2 = tournament(tournament_k, population, population_fitness)
+    for i in range(ceil(len(population) / parentsn)):
+        parents = []
+        fitnesses = []
+        for j in range(parentsn):
+            parent, fitness = tournament(tournament_k, population, population_fitness)
+            parents.append(parent)
+            fitnesses.append(fitness)
 
-        children = multi_parent_crossover(p_cross, [parent1,parent2], [fitness1,fitness2])
-        assert(len(children) == 2)
-        child1 = children[0]
-        child2 = children[1]
+        children = multi_parent_crossover(p_cross, parents, fitnesses)
+
         # child1 = discrete_recombination(p_cross, parent1, parent2, fitness1, fitness2, '1')
         # child2 = discrete_recombination(p_cross, parent1, parent2, fitness1, fitness2, '2')
 
         #mutate
-        child1 = mutate(p_mutation, child1, mutation_strength)
-        child2 = mutate(p_mutation, child2, mutation_strength)
+        children = [mutate(p_mutation, child, mutation_strength) for child in children]
 
-        new_generation[i*2] = np.clip(child1, lowerbound, upperbound)
-        new_generation[i*2 + 1] = np.clip(child2, lowerbound, upperbound)
+        if (i+1)*parentsn > len(population):
+            # We might be generating too many children; simply cut off the last ones.
+            children = children[:len(population)-i*parentsn]
 
-        new_fitness[i*2] = evaluate(env, new_generation[i*2])
-        new_fitness[i*2 + 1] = evaluate(env, new_generation[i*2 + 1])
+        print(len(children), len(parents), len(fitnesses))
+
+        for j, child in enumerate(children):
+            new_generation[i*parentsn + j] = np.clip(child, lowerbound, upperbound)
+            new_fitness[i*parentsn + j] = evaluate(env, new_generation[i*parentsn + j])
 
 
     #Replace weakest with elitest
