@@ -143,6 +143,29 @@ def k_point_crossover(p_cross, k, parent1, parent2, parent1fit, parent2fit):
 
     return child1, child2
 
+def multi_parent_crossover(p_cross: float, parents: list, parents_fit):
+    if np.random.uniform() > p_cross:
+        return parents
+
+    parent_size = len(parents[0])
+    num_parents = len(parents)
+
+    cuts = np.sort(np.random.choice(range(1, parent_size-1), num_parents, False))
+    cuts = np.append(cuts, parent_size)
+
+    children = [[] for _ in range(num_parents)]
+
+    for i, cut in enumerate(cuts):
+        for j, child in enumerate(children):
+            current_parent_i = (j+i)%num_parents
+            child.extend(parents[current_parent_i][len(child):cut])
+
+    children = [np.array(child) for child in children]
+
+    return children
+
+
+
 # def discrete_recombination(p_cross, parent1, parent2, parent1fit, parent2fit, parent_number):
 #     parent_size = len(parent1)
 
@@ -240,7 +263,10 @@ for gen in range(starting_generation + 1, generations):
         parent1, fitness1 = tournament(tournament_k, population, population_fitness)
         parent2, fitness2 = tournament(tournament_k, population, population_fitness)
 
-        child1, child2 = k_point_crossover(p_cross, crossover_k, parent1, parent2, fitness1, fitness2)
+        children = multi_parent_crossover(p_cross, [parent1,parent2], [fitness1,fitness2])
+        assert(len(children) == 2)
+        child1 = children[0]
+        child2 = children[1]
         # child1 = discrete_recombination(p_cross, parent1, parent2, fitness1, fitness2, '1')
         # child2 = discrete_recombination(p_cross, parent1, parent2, fitness1, fitness2, '2')
 
