@@ -18,7 +18,7 @@ import sys, os
 
 run_mode = 'train' # train or test
 start_new_generation = False # Delete the current directory of saves, to start training from the beginning
-experiment_name = 'EvolutionaryAlgorithm2'
+experiment_name = 'EvolutionaryAlgorithm3'
 
 # Enemy and fitness function
 enemy = 6
@@ -32,7 +32,7 @@ population_size = 100
 generations = 30
 mutation_strength = 1 # Gaussian sigma
 p_mutation = 0.02
-p_cross = 0.8
+p_cross = 0
 elite_fraction = 0.05
 
 tournament_k = 3
