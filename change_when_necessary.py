@@ -18,7 +18,7 @@ import sys, os
 
 run_mode = 'train' # train or test
 start_new_generation = False # Delete the current directory of saves, to start training from the beginning
-experiment_name = 'EvolutionaryAlgorithm3'
+experiment_name = 'change_when_necessary'
 
 # Enemy and fitness function
 enemies = [4,7,8]
@@ -32,7 +32,7 @@ population_size = 100
 generations = 30
 mutation_strength = 1 # Gaussian sigma
 p_mutation = 0.02
-p_cross = 0.0
+p_cross = 0.4
 elite_fraction = 0.05
 
 tournament_k = 3
@@ -314,11 +314,16 @@ for gen in range(starting_generation + 1, generations+1):
     mean = np.mean(population_fitness[:,-1])
     std = np.std(population_fitness[:,-1])
 
-    if std > 30:
-        averages = population_fitness[:-1].mean(axis=0)
+    std_between_enemies = np.std(np.mean(population_fitness, axis=1))
+    print("std deviation between enemies: " + str(std_between_enemies))
+    if std_between_enemies > 30-gen:
+        averages = population_fitness[:,:-1].mean(axis=0)
         weights = 1 / averages
-    elif std < 10:
+        print("updating weights to " + str(weights))
+        p_cross = .9
+    else:
         weights = [ 1 for enemy in enemies ]
+        p_cross = .4
 
     best_index = np.argmax(population_fitness[:,-1])
     if population_fitness[best_index][-1] > best_fitness[-1]:
