@@ -73,19 +73,18 @@ class Environment(Environment):
         default_weight = 1 / num_enemies
         weights = [default_weight] * num_enemies
 
-        worst_performer_depriority = (1/3)*weight_priority
-        others_depriority = (2/3)*weight_priority / (num_enemies - 1)
+        weight_depriority = weight_priority / num_enemies
 
         # weight_priority = 0.05 # relative change 0.38 vs 0.25, 0.25
         fitnesses = [(enemy, fitness) for enemy, fitness in zip(enemies, values)]
         min_enemy, min_fitness = min(fitnesses, key=lambda x: x[1])
         # self.min_enemy = min_enemy
-
+        
         for i, (e, fitness) in enumerate(fitnesses):
             if e == min_enemy:
-                weights[i] = default_weight + worst_performer_depriority
+                weights[i] = default_weight + weight_depriority*(num_enemies - 1)
             else:
-                weights[i] = default_weight - others_depriority
+                weights[i] = default_weight - weight_depriority
 
         aggregate_fitness = sum([(w * v) for w, v in zip(weights, values)])
 
