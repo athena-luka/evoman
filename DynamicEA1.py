@@ -255,7 +255,7 @@ best_fitness = best_individual.fitness.values[0]
 fitness_implementation = "classic"
 reporting_fitnesses = [evaluate(individual) for individual in population]
 mean_fitness = np.mean(reporting_fitnesses)
-std_fitness = np.mean(reporting_fitnesses)
+std_fitness = np.std(reporting_fitnesses)
 fitness_implementation = "weighted"
 
 # saves results for first pop
@@ -293,7 +293,7 @@ for gen in range(starting_generation + 1, generations):
     fitness_implementation = "classic"
     reporting_fitnesses = [evaluate(individual) for individual in population]
     mean_fitness = np.mean(reporting_fitnesses)
-    std_fitness = np.mean(reporting_fitnesses)
+    std_fitness = np.std(reporting_fitnesses)
     fitness_implementation = "weighted"
 
 
