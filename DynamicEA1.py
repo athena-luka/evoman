@@ -24,24 +24,20 @@ start_new_generation = False # Delete the current directory of saves, to start t
 experiment_name = 'EA1'
 
 # Enemy and fitness function
-enemies = [3, 4, 7]
-# enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+# enemies = [3, 4, 7]
+enemies = [1, 2, 3, 4, 5, 6, 7, 8]
 
-enemy_life_weight = 0.9
-player_life_weight = 0.1
-weight_priority = 0.05
+enemy_life_weight = 0.757
+player_life_weight = 1 - enemy_life_weight
 
 # Parameters
 upperbound = 1
 lowerbound = -1
 population_size = 100
-generations = 60
-
-frac_exploitation_group = 0.5
-frac_exploration_group = 1 - frac_exploitation_group
+generations = 30
 
 # Exploit parameters
-exploit_mutation_strength = 0.1 # Gaussian sigma
+exploit_mutation_strength = 0.436 # Gaussian sigma
 exploit_p_mutation = 0.3
 exploit_p_cross = 0.3
 exploit_tournament_k = 5
@@ -49,7 +45,7 @@ elite_fraction = 0.05
 exploit_crossover_eta = 30
 
 # Explore parameters
-explore_mutation_strength = 0.6 # Gaussian sigma
+explore_mutation_strength = 1.554 # Gaussian sigma
 explore_p_mutation = 0.3
 explore_p_cross = 0.3
 explore_tournament_k = 2
@@ -125,7 +121,6 @@ def evaluate_multi(individual):
 
 
 toolbox.register("evaluate", evaluate)
-# toolbox.register("mate", tools.cxSimulatedBinaryBounded, eta=exploit_crossover_eta, low=lowerbound, up=upperbound)
 toolbox.register("mate", tools.cxSimulatedBinary, eta=exploit_crossover_eta)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=exploit_mutation_strength, indpb=exploit_p_mutation)
 toolbox.register("select", tools.selTournament, tournsize=exploit_tournament_k)
@@ -215,9 +210,17 @@ if run_mode == 'test':
     print( '\n RUNNING SAVED BEST SOLUTION \n')
     env.update_parameter('speed','normal')
     env.update_parameter('visuals', True)
-    fit, plife, elife, runtime = env.play(pcont=bsol)
-    print("Gain:", plife - elife)
 
+    env.update_parameter('multiplemode', "no")
+    cumulative_gain = 0
+    all_enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+    for e in all_enemies:
+        env.update_parameter('enemies', [e])
+        fit, plife, elife, runtime = env.play(pcont=bsol)
+        cumulative_gain += plife - elife
+        print(f"enemy {e} Gain:", plife - elife)
+
+    print("Cumulative Gain:", cumulative_gain)
     sys.exit(0)
 
 
@@ -252,11 +255,9 @@ best_fitness = best_individual.fitness.values[0]
 
 
 # Collect all non weighted fitness values for reporting statistics
-fitness_implementation = "classic"
 reporting_fitnesses = [evaluate(individual) for individual in population]
 mean_fitness = np.mean(reporting_fitnesses)
 std_fitness = np.std(reporting_fitnesses)
-fitness_implementation = "weighted"
 
 # saves results for first pop
 file_aux  = open(experiment_name+'/results.txt','a')
@@ -290,11 +291,9 @@ for gen in range(starting_generation + 1, generations):
 
 
     # Collect all non weighted fitness values for reporting statistics
-    fitness_implementation = "classic"
     reporting_fitnesses = [evaluate(individual) for individual in population]
     mean_fitness = np.mean(reporting_fitnesses)
     std_fitness = np.std(reporting_fitnesses)
-    fitness_implementation = "weighted"
 
 
     # saves results
