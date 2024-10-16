@@ -26,24 +26,21 @@ experiment_name = 'EA2'
 
 # Enemy and fitness function
 fitness_implementation = "weighted"
-enemies = [3, 4, 7]
-# enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+# enemies = [3, 4, 7]
+enemies = [1, 2, 3, 4, 5, 6, 7, 8]
 
-enemy_life_weight = 0.9
-player_life_weight = 0.1
-weight_priority = 0.05
+enemy_life_weight = 0.294
+player_life_weight = 1 - enemy_life_weight
+weight_priority = 0.0721
 
 # Parameters
 upperbound = 1
 lowerbound = -1
 population_size = 100
-generations = 60
-
-frac_exploitation_group = 0.5
-frac_exploration_group = 1 - frac_exploitation_group
+generations = 30
 
 # Exploit parameters
-exploit_mutation_strength = 0.1 # Gaussian sigma
+exploit_mutation_strength = 0.895 # Gaussian sigma
 exploit_p_mutation = 0.3
 exploit_p_cross = 0.3
 exploit_tournament_k = 5
@@ -51,7 +48,7 @@ elite_fraction = 0.05
 exploit_crossover_eta = 30
 
 # Explore parameters
-explore_mutation_strength = 0.6 # Gaussian sigma
+explore_mutation_strength = 3.67 # Gaussian sigma
 explore_p_mutation = 0.3
 explore_p_cross = 0.3
 explore_tournament_k = 2
@@ -79,7 +76,7 @@ class Environment(Environment):
         fitnesses = [(enemy, fitness) for enemy, fitness in zip(enemies, values)]
         min_enemy, min_fitness = min(fitnesses, key=lambda x: x[1])
         # self.min_enemy = min_enemy
-        
+
         for i, (e, fitness) in enumerate(fitnesses):
             if e == min_enemy:
                 weights[i] = default_weight + weight_depriority*(num_enemies - 1)
@@ -121,7 +118,7 @@ class Environment(Environment):
 
 
 # choose this for not using visuals and thus making experiments faster
-headless = False
+headless = True
 if headless:
     os.environ["SDL_VIDEODRIVER"] = "dummy"
 
@@ -270,10 +267,25 @@ def explore(exploration_group, p_cross, crossover_eta, p_mutation, mutation_stre
 if run_mode == 'test':
     bsol = np.loadtxt(experiment_name + '/best.txt')
     print( '\n RUNNING SAVED BEST SOLUTION \n')
-    env.update_parameter('speed','normal')
+    env.update_parameter('speed','fastest')
     env.update_parameter('visuals', True)
-    fit, plife, elife, runtime = env.play(pcont=bsol)
-    print("Gain:", plife - elife)
+
+    env.update_parameter('multiplemode', "no")
+    cumulative_gain = 0
+    all_enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+    enemies_beaten = []
+    for e in all_enemies:
+        env.update_parameter('enemies', [e])
+        fit, plife, elife, runtime = env.play(pcont=bsol)
+        gain = plife - elife
+        if gain > 0:
+            enemies_beaten.append(e)
+        cumulative_gain += gain
+        print(f"enemy {e} Gain:", plife - elife)
+
+    print("\nCumulative Gain:", cumulative_gain)
+    print("\nAmount of enemies beaten:", len(enemies_beaten), "\nEnemies:", enemies_beaten)
+
 
     sys.exit(0)
 
