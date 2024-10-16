@@ -214,13 +214,18 @@ if run_mode == 'test':
     env.update_parameter('multiplemode', "no")
     cumulative_gain = 0
     all_enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+    enemies_beaten = []
     for e in all_enemies:
         env.update_parameter('enemies', [e])
         fit, plife, elife, runtime = env.play(pcont=bsol)
-        cumulative_gain += plife - elife
+        gain = plife - elife
+        if gain > 0:
+            enemies_beaten.append(e)
+        cumulative_gain += gain
         print(f"enemy {e} Gain:", plife - elife)
 
-    print("Cumulative Gain:", cumulative_gain)
+    print("\nCumulative Gain:", cumulative_gain)
+    print("\nAmount of enemies beaten:", len(enemies_beaten), "\nEnemies:", enemies_beaten)
     sys.exit(0)
 
 
