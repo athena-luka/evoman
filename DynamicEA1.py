@@ -208,7 +208,7 @@ def explore(exploration_group, p_cross, crossover_eta, p_mutation, mutation_stre
 if run_mode == 'test':
     bsol = np.loadtxt(experiment_name + '/best.txt')
     print( '\n RUNNING SAVED BEST SOLUTION \n')
-    env.update_parameter('speed','normal')
+    env.update_parameter('speed','fastest')
     env.update_parameter('visuals', True)
 
     env.update_parameter('multiplemode', "no")
